@@ -17,7 +17,6 @@ def main():
     # check if previously extracted data
     path = "./results.csv"
     prev_df = pd.read_csv(path)
-    print(prev_df)
 
     # Go to HLJ website and crawl all latest in stock figures
     entries = []
@@ -26,6 +25,9 @@ def main():
 
     df = pd.DataFrame(entries)
     df.to_csv(path, index=False, lineterminator="\n")
+    # TODO: we need to mege the two df together.
+    #  As long as there is a full row that is exactly the same, we merge. else keep both.
+    #  date extracted do not need to be compared. always take the latest date
 
 
 def get_items(max_pages: int = 1) -> list:
