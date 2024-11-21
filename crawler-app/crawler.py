@@ -2,6 +2,8 @@ from requests import request
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 import tqdm
+import pandas as pd
+from datetime import datetime
 
 URL = "https://www.hlj.com"
 HEAD = {
@@ -12,37 +14,54 @@ HEAD = {
 
 
 def main():
-    new_url = get_url(page=1, category="Figures", stock="In Stock", scale=[8, 7, 6, 5, 4], sort="releaseDate desc")
-    rsp = request("GET", new_url, headers=HEAD)
-    data_list = get_items(rsp.text)
-    print(list(data_list))
+    # check if previously extracted data
+    path = "./results.csv"
+    prev_df = pd.read_csv(path)
+    print(prev_df)
+
+    # Go to HLJ website and crawl all latest in stock figures
+    entries = []
+    for item in get_items(max_pages=3):
+        entries.append(item)
+
+    df = pd.DataFrame(entries)
+    df.to_csv(path, index=False, lineterminator="\n")
 
 
-def get_items(html: str) -> list:
-    sp = BeautifulSoup(html, 'html.parser')
-    grid_items = sp.find("div", attrs={"class": "search search-widget-blocks"})
-    items = grid_items.find_all("div", attrs={"class": "search-widget-block"})
-    for i in tqdm.tqdm(items, total=len(items), desc="Crawling Data"):
-        product_link = i.find("p", attrs={"class": "product-item-name"})
-        page_url = "https://www.hlj.com" + product_link.a["href"]
-        price, maker, jan, release = get_page_details(page_url)
+def get_items(max_pages: int = 1) -> list:
+    for page in tqdm.tqdm(range(1, max_pages + 1), total=max_pages, desc="Crawling Data"):
+        new_url = get_url(page=page, category="Figures",
+                          stock="In Stock", scale=[8, 7, 6, 5, 4],
+                          sort="releaseDate desc")
+        rsp = request("GET", new_url, headers=HEAD)
 
-        data = {
-            "img_url": "https:" + i.find("a", attrs={"class": "item-img-wrapper"}).img["src"],
-            "title": product_link.a.text.strip(),
-            "page_url": page_url,
-            "price": price,
-            "maker": maker,
-            "JAN_code": jan,
-            "release_date": release
-        }
+        sp = BeautifulSoup(rsp.text, 'html.parser')
+        grid_items = sp.find("div", attrs={"class": "search search-widget-blocks"})
+        items = grid_items.find_all("div", attrs={"class": "search-widget-block"})
 
-        yield data
+        # Per Page, crawl each grid box
+        for i in items:
+            product_link = i.find("p", attrs={"class": "product-item-name"})
+            page_url = "https://www.hlj.com" + product_link.a["href"]
+            price, maker, jan, release = get_page_details(page_url)
+
+            data = {
+                "img_url": "https:" + i.find("a", attrs={"class": "item-img-wrapper"}).img["src"],
+                "title": product_link.a.text.strip(),
+                "page_url": page_url,
+                "price": price,
+                "maker": maker,
+                "JAN_code": jan,
+                "release_date": release,
+                "date_extracted": datetime.now()
+            }
+
+            yield data
 
 
 def get_page_details(url) -> tuple:
     def get_text(parent):
-        return "".join(parent.find_all(text=True, recursive=False)).strip()
+        return "".join(parent.find_all(string=True, recursive=False)).strip()
 
     rsp = request("GET", url, headers=HEAD)
     sp = BeautifulSoup(rsp.text, "html.parser")
