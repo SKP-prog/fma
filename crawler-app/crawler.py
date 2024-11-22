@@ -24,10 +24,19 @@ def main():
         entries.append(item)
 
     df = pd.DataFrame(entries)
-    df.to_csv(path, index=False, lineterminator="\n")
-    # TODO: we need to mege the two df together.
-    #  As long as there is a full row that is exactly the same, we merge. else keep both.
-    #  date extracted do not need to be compared. always take the latest date
+    df["JAN_code"] = df["JAN_code"].astype("int64")
+
+    # Merge tables
+    keys = ["JAN_code", "price"]
+    cols = [x for x in df.columns if x not in keys]
+    out_df = pd.merge(prev_df, df, how="outer", left_on=keys, right_on=keys, indicator=True)
+
+    for col in cols:
+        out_df.loc[out_df["_merge"] == "right_only", col + "_x"] = (
+            out_df.loc)[out_df["_merge"] == "right_only", col + "_y"]
+
+    out_df[cols] = out_df[[x + "_x" for x in cols]]
+    out_df[keys + cols].to_csv(path, index=False, lineterminator="\n")
 
 
 def get_items(max_pages: int = 1) -> list:
