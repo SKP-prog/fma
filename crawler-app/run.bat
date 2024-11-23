@@ -1,0 +1,1 @@
+start cmd /k "C:\Users\shawn\Documents\Code\HLJData\.venv\Scripts\activate.bat & cd C:\Users\shawn\Documents\Code\HLJData & python crawler.py"
