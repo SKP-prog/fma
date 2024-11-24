@@ -5,6 +5,9 @@ import tqdm
 import pandas as pd
 from datetime import datetime
 
+import mongo
+import mongo as m
+
 URL = "https://www.hlj.com"
 HEAD = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -14,9 +17,9 @@ HEAD = {
 
 
 def main():
-    # check if previously extracted data
-    path = "./results.csv"
-    prev_df = pd.read_csv(path)
+    prev_df = pd.DataFrame(m.get_db())
+    if not prev_df.empty:
+        del prev_df['_id']
 
     # Go to HLJ website and crawl all latest in stock figures
     entries = []
@@ -29,14 +32,17 @@ def main():
     # Merge tables
     keys = ["JAN_code", "price"]
     cols = [x for x in df.columns if x not in keys]
+    if prev_df.empty:
+        prev_df = pd.DataFrame(columns=keys + cols)
     out_df = pd.merge(prev_df, df, how="outer", left_on=keys, right_on=keys, indicator=True)
-
+    out_df = out_df.loc[(out_df['_merge'] == "right_only")]
     for col in cols:
-        out_df.loc[out_df["_merge"] == "right_only", col + "_x"] = (
-            out_df.loc)[out_df["_merge"] == "right_only", col + "_y"]
+        out_df[col] = out_df[col + "_y"]
 
-    out_df[cols] = out_df[[x + "_x" for x in cols]]
-    out_df[keys + cols].to_csv(path, index=False, lineterminator="\n")
+    if not out_df.empty:
+        m.update_db(out_df[keys + cols].to_dict("records"))
+    else:
+        print("Nothing to Update.")
 
 
 def get_items(max_pages: int = 1) -> list:
