@@ -1,0 +1,1 @@
+start cmd /k "cd C:\Users\shawn\Documents\Code\HLJ\HLJ_frontend & npx live-server"
