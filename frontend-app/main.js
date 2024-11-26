@@ -1,7 +1,7 @@
 import { make_thumbnail, read_file, set_active_nav, reload_hIcon } from "./utils/library.js";
 
 window.onload = (e) => {
-  read_file("nav.html")
+  read_file("components/nav.html")
   .then(html_data => {
     document.getElementById("navigation").innerHTML = html_data;
     set_active_nav("nav_home");
@@ -32,17 +32,17 @@ function displayRecent() {
   const content = document.getElementById("displayContent");
   get_recent().then((data) => {
     data["results"].forEach((d) => {
-      make_thumbnail(content, d, "http://localhost:8000" + d.image_url);
-      document.getElementById(`a_${d.code}`).onclick = () => reload_hIcon(d.code);
+      make_thumbnail(content, d, d.img_url);
+      document.getElementById(`a_${d.JAN_code}`).onclick = () => reload_hIcon(d.JAN_code);
     });
   });
 }
 
 async function get_recent() {
-  const rsp = await fetch("http://localhost:8000/app/amiami/recent", {
+  const rsp = await fetch("http://localhost:8000/figures", {
     method: "GET",
     headers: {
-      Accept: "application/json",
+      "Accept": "application/json",
       "Content-Type": "application/json",
     },
   });
