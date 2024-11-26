@@ -5,7 +5,6 @@ import tqdm
 import pandas as pd
 from datetime import datetime
 
-import mongo
 import mongo as m
 
 URL = "https://www.hlj.com"
@@ -41,6 +40,7 @@ def main():
 
     if not out_df.empty:
         m.update_db(out_df[keys + cols].to_dict("records"))
+        print("Updated MongoDB.")
     else:
         print("Nothing to Update.")
 
