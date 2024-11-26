@@ -60,10 +60,10 @@ def get_items(max_pages: int = 1) -> list:
         for i in items:
             product_link = i.find("p", attrs={"class": "product-item-name"})
             page_url = "https://www.hlj.com" + product_link.a["href"]
-            price, maker, jan, release = get_page_details(page_url)
+            price, maker, image_url, jan, release = get_page_details(page_url)
 
             data = {
-                "img_url": "https:" + i.find("a", attrs={"class": "item-img-wrapper"}).img["src"],
+                "img_url": image_url,  # "https:" + i.find("a", attrs={"class": "item-img-wrapper"}).img["src"]
                 "title": product_link.a.text.strip(),
                 "page_url": page_url,
                 "price": price,
@@ -92,7 +92,12 @@ def get_page_details(url) -> tuple:
     details = sp.find("div", attrs={"class": "product-details"}).find_all("li")
     details = [x.text.strip() for x in details if "Release Date:" in x.text or "JAN Code:" in x.text]
 
-    return (price, maker,
+    # Product Image
+    p_images = sp.find("div", attrs={"class": "product-images"})
+    first_image = p_images.find("a")
+    image_url = "https:" + first_image['href']
+
+    return (price, maker, image_url,
             details[0].replace("JAN Code:", "").strip(),
             details[1].replace("Release Date:", "").strip())
 
