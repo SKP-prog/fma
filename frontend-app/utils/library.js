@@ -12,7 +12,7 @@ export function make_thumbnail(body, data, src){
   }
 
   div.innerHTML = `
-    <div id='details'>${data.title}</div>
+    <div id='detail_${data.JAN_code}' class='details details-collapse'>${data.title}</div>
     <!--  Heart Icon -->
     <a href="javascript:void(0);" id="a_${data.JAN_code}">
     <div class="iconwrapper left">

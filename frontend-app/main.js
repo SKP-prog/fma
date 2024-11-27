@@ -34,6 +34,16 @@ function displayRecent() {
     data["results"].forEach((d) => {
       make_thumbnail(content, d, d.img_url);
       document.getElementById(`a_${d.JAN_code}`).onclick = () => reload_hIcon(d.JAN_code);
+      // Add event listener on hover
+      const detail = document.getElementById(`detail_${d.JAN_code}`);
+      detail.addEventListener('mouseenter', (e) => { 
+        e.target.classList.add("details-expand"); 
+        e.target.classList.remove("details-collapse");
+      });
+      detail.addEventListener('mouseleave', (e) => { 
+        e.target.classList.add("details-collapse"); 
+        e.target.classList.remove("details-expand");
+      });
     });
   });
 }

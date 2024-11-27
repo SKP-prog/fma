@@ -152,7 +152,7 @@ nav {
 .iconwrapper i {
     margin-top: var(--space-3xs);
 }
-.thumbnail #details {
+.thumbnail .details {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -160,17 +160,34 @@ nav {
     font-weight: bold;
     padding: var(--space-xs);
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     background-color: var(--hex-ika-purple);
     font-size: 12px;
-    max-height: 12px;
     opacity: 0.8;
     width: calc(100% - 2 * var(--space-xs));
+    cursor: pointer;
+}
+.details-collapse {
+    animation: details-collapse 0.1s ease-in;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-height: 15px;
+}
+@keyframes details-collapse {
+    from { white-space: normal; max-height: 50px; }
+    to {  max-height: 15px; }
+}
+.details-expand {
+    animation: details-expand .1s ease-out;
+    white-space: normal;
+    max-height: 50px;
+}
+@keyframes details-expand {
+    from { max-height: 15px; }
+    to { max-height: 50px;}
 }
 
 /* Details */
-.details {
+/* .details {
     margin-top: 25px; 
     margin-bottom: 25px;
     background-color: white;
@@ -179,4 +196,4 @@ nav {
     height: 250px;
     width: 100%;
     padding: var(--space-xs) var(--space-s);
-}
+} */
