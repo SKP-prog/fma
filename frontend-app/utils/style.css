@@ -152,17 +152,21 @@ nav {
 .iconwrapper i {
     margin-top: var(--space-3xs);
 }
-.thumbnail #code {
+.thumbnail #details {
     position: absolute;
-    bottom: var(--space-xs);
-    left: var(--space-xs);
+    bottom: 0;
+    left: 0;
     color: white;
     font-weight: bold;
     padding: var(--space-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     background-color: var(--hex-ika-purple);
-    border-radius: 15px;
     font-size: 12px;
+    max-height: 12px;
     opacity: 0.8;
+    width: calc(100% - 2 * var(--space-xs));
 }
 
 /* Details */
