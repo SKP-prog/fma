@@ -1,3 +1,4 @@
+import pymongo
 from pymongo import MongoClient
 import pandas as pd
 
@@ -28,12 +29,38 @@ class DB:
             del df["_id"]
         return df
 
-    def get_figurine(self, jan_code=None):
-        flt = {}
+    def get_figurine(self, jan_code: int = None, page_num=1, page_size=20):
+        # Create Filter Aggregate. Get unique JAN_code with all its required fields
+        pipeline = [
+            {
+                "$group": {
+                    # Name each column to its new column name
+                    "_id": {
+                        "JAN_code": "$JAN_code"
+                    },
+                    "JAN_code": {"$first": "$JAN_code"},
+                    "img_url": {"$first": "$img_url"},
+                    "title": {"$first": "$title"},
+                    "page_url": {"$first": "$page_url"},
+                    "maker": {"$first": "$maker"},
+                    "release_date": {"$first": "$release_date"},
+                }
+            },
+            {
+                "$sort": {
+                    "release_date": pymongo.DESCENDING,
+                    "JAN_code": pymongo.DESCENDING
+                }
+            }
+        ]
         if jan_code is not None:
-            flt["JAN_code"] = jan_code
+            pipeline = [{"$match": {"JAN_code": jan_code}}] + pipeline
 
-        df = pd.DataFrame(list(self.table.find(flt)))
-        df.drop_duplicates(subset=["JAN_code"], inplace=True)
+        # Get Mongo Results
+        mongo_results = self.table.aggregate(pipeline)
+        df = pd.DataFrame(list(mongo_results))
+
+        if df.empty:
+            return pd.DataFrame(columns=["JAN_code", "img_url", "title", "page_url", "maker", "release_date"])
+
         return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date"]]
-

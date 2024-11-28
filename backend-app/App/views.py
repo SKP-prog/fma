@@ -16,6 +16,10 @@ def figure(request):
         return HttpResponseBadRequest("Only GET request allowed.")
 
     jan_code = request.GET.get("jan", None)
-    df = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None)
+    page_num = request.GET.get("page", None)
+    if page_num is None:
+        page_num = 1
+
+    df = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None, page_num=page_num)
     return JsonResponse({"results": df.to_dict("records")})
 
