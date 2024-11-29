@@ -1,4 +1,6 @@
-import { make_thumbnail, read_file, set_active_nav, reload_hIcon } from "./utils/library.js";
+import { 
+  make_thumbnail, read_file, set_active_nav, reload_hIcon, set_pagination
+ } from "./utils/library.js";
 
 window.onload = (e) => {
   read_file("components/nav.html")
@@ -29,8 +31,15 @@ window.onload = (e) => {
 // })
 
 function displayRecent() {
+  // Get page Number
+  const urlParams = new URLSearchParams(window.location.search);
+  let pageNum = urlParams.get("page");
+  if(pageNum == null){
+    pageNum = 1;
+  }
+  
   const content = document.getElementById("displayContent");
-  get_recent().then((data) => {
+  get_recent(pageNum).then((data) => {
     data["results"].forEach((d) => {
       make_thumbnail(content, d, d.img_url);
       document.getElementById(`a_${d.JAN_code}`).onclick = () => reload_hIcon(d.JAN_code);
@@ -45,11 +54,12 @@ function displayRecent() {
         e.target.classList.remove("details-expand");
       });
     });
+    set_pagination(data["metadata"]);
   });
 }
 
-async function get_recent() {
-  const rsp = await fetch("http://localhost:8000/figures", {
+async function get_recent(pageNum) {
+  const rsp = await fetch(`http://localhost:8000/figures?page=${pageNum}`, {
     method: "GET",
     headers: {
       "Accept": "application/json",

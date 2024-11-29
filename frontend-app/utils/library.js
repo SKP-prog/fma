@@ -68,3 +68,14 @@ export function reload_hIcon(code) {
   //     });
   // }
 }
+
+export function set_pagination(page_data){
+  const pagination = document.getElementById("pagination");
+  
+  for(let i=1; i<=page_data["totalPages"]; i++){
+    const a = document.createElement("a");
+    a.innerHTML = i;
+    a.href = `?page=${i}`
+    pagination.appendChild(a);
+  }
+}
