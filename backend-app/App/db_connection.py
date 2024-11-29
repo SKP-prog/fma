@@ -1,6 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 import pandas as pd
+from math import ceil
 
 
 class DB:
@@ -31,36 +32,55 @@ class DB:
 
     def get_figurine(self, jan_code: int = None, page_num=1, page_size=20):
         # Create Filter Aggregate. Get unique JAN_code with all its required fields
+        group = {
+            "$group": {
+                # Name each column to its new column name
+                "_id": {"JAN_code": "$JAN_code"},
+                "JAN_code": {"$first": "$JAN_code"},
+                "img_url": {"$first": "$img_url"},
+                "title": {"$first": "$title"},
+                "page_url": {"$first": "$page_url"},
+                "maker": {"$first": "$maker"},
+                "release_date": {"$first": "$release_date"},
+            }
+        }
+        sort = {
+            "$sort": {
+                "release_date": pymongo.DESCENDING,
+                "JAN_code": pymongo.DESCENDING
+            }
+        }
+
         pipeline = [
             {
-                "$group": {
-                    # Name each column to its new column name
-                    "_id": {
-                        "JAN_code": "$JAN_code"
-                    },
-                    "JAN_code": {"$first": "$JAN_code"},
-                    "img_url": {"$first": "$img_url"},
-                    "title": {"$first": "$title"},
-                    "page_url": {"$first": "$page_url"},
-                    "maker": {"$first": "$maker"},
-                    "release_date": {"$first": "$release_date"},
-                }
-            },
-            {
-                "$sort": {
-                    "release_date": pymongo.DESCENDING,
-                    "JAN_code": pymongo.DESCENDING
+                "$facet": {
+                    "data": [
+                        group,
+                        sort,
+                        {"$skip": (page_num - 1) * page_size},
+                        {"$limit": page_size}
+                    ],
+                    "metadata": [
+                        group,
+                        {"$count": "totalRecords"}
+                    ],
                 }
             }
         ]
-        if jan_code is not None:
-            pipeline = [{"$match": {"JAN_code": jan_code}}] + pipeline
+        # if jan_code is not None:
+        #     pipeline = [{"$match": {"JAN_code": jan_code}}] + pipeline
 
         # Get Mongo Results
-        mongo_results = self.table.aggregate(pipeline)
-        df = pd.DataFrame(list(mongo_results))
+        mongo_results = list(self.table.aggregate(pipeline))[0]
+        data = mongo_results['data']
 
+        # Add Meta Data
+        meta_data = mongo_results['metadata'][0]
+        meta_data["pageSize"] = page_size
+        meta_data["totalPages"] = ceil(meta_data["totalRecords"] / page_size)
+
+        df = pd.DataFrame(data)
         if df.empty:
             return pd.DataFrame(columns=["JAN_code", "img_url", "title", "page_url", "maker", "release_date"])
 
-        return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date"]]
+        return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date"]], meta_data

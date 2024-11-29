@@ -20,6 +20,6 @@ def figure(request):
     if page_num is None:
         page_num = 1
 
-    df = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None, page_num=page_num)
-    return JsonResponse({"results": df.to_dict("records")})
+    df, meta = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None, page_num=page_num)
+    return JsonResponse({"results": df.to_dict("records"), "metadata": meta})
 
