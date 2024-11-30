@@ -72,10 +72,42 @@ export function reload_hIcon(code) {
 export function set_pagination(page_data){
   const pagination = document.getElementById("pagination");
   
+  // Get Current Page Number to set as active
+  const urlParams = new URLSearchParams(window.location.search);
+  let pageNum = parseInt(urlParams.get("page"));
+  if(isNaN(pageNum)){
+    pageNum = 1;
+  }
+
   for(let i=1; i<=page_data["totalPages"]; i++){
+    // Back Arrow
+    if(i == 1){
+      const a = document.createElement("a");
+      a.innerHTML = "&laquo;";
+      if(pageNum <= 1){
+        a.className = "disabled";
+      }
+      a.href = `?page=${pageNum-1}`;
+      pagination.appendChild(a);
+    }
+
     const a = document.createElement("a");
     a.innerHTML = i;
-    a.href = `?page=${i}`
+    if(pageNum == i){
+      a.className = "active";
+    }
+    a.href = `?page=${i}`;
     pagination.appendChild(a);
+
+    // Front Arrow
+    if(i == page_data["totalPages"]){
+      const a = document.createElement("a");
+      a.innerHTML = "&raquo;";
+      if(pageNum >= page_data["totalPages"]){
+        a.className = "disabled";
+      }
+      a.href = `?page=${pageNum+1}`;
+      pagination.appendChild(a);
+    }
   }
 }
