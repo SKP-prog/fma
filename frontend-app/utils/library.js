@@ -53,20 +53,14 @@ export function reload_hIcon(code) {
   // else stop tracking
 
   var data = new FormData();
-  data.append("code", code);
-
-  // if (heart_icon.classList.contains("fa-heart-o")) {
-  //     heart_icon.classList.remove("fa-heart-o");
-  //     heart_icon.classList.add("fa-heart");
-  //     fetch("http://localhost:8000/app/figure/update", {
-  //         method: "POST",
-  //         body: data,
-  //     })
-  //     .then((rsp) => rsp.json())
-  //     .then((data) => {
-  //         console.log(data);
-  //     });
-  // }
+  data.append("jan", code);
+  fetch("http://localhost:8000/favs", {
+    method: "POST",
+    body: data
+  }).then((rsp) => rsp.json())
+  .then((data) => {
+    console.log(data);
+  });
 }
 
 export function set_pagination(page_data){
