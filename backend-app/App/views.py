@@ -35,5 +35,5 @@ def favs(request):
         # TBD - for view favourites
         return HttpResponseBadRequest("Only POST Request Allowed.")
 
-    print(request.body)
+    jan_code = request.POST.get('jan', None)
     return JsonResponse({"results": "HELLO!"})
