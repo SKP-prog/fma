@@ -12,6 +12,9 @@ def index(request):
 
 
 def figure(request):
+    """
+    Extract figure listing from HLJ
+    """
     if request.method == "POST":
         return HttpResponseBadRequest("Only GET request allowed.")
 
@@ -23,3 +26,14 @@ def figure(request):
     df, meta = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None, page_num=int(page_num))
     return JsonResponse({"results": df.to_dict("records"), "metadata": meta})
 
+
+def favs(request):
+    """
+    add/view/update Favourites
+    """
+    if request.method == "GET":
+        # TBD - for view favourites
+        return HttpResponseBadRequest("Only POST Request Allowed.")
+
+    print(request.body)
+    return JsonResponse({"results": "HELLO!"})
