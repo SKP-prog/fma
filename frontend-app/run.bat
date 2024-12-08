@@ -1,1 +1,1 @@
-start cmd /k "cd C:\Users\shawn\Documents\Code\HLJ\HLJ_frontend & npx live-server"
+start cmd /k "cd %~dp0 & npx live-server"

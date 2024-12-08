@@ -1,5 +1,5 @@
-cd C:\Users\shawn\Documents\Code\HLJ
-call HLJ_backend\run.bat
-call HLJ_frontend\run.bat
+cd %~dp0
+call backend-app\run.bat
+call frontend-app\run.bat
 
-
+mongod --dbpath "C:\Users\shawn\OneDrive\Database\mongo-data"
