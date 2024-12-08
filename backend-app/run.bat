@@ -1,0 +1,1 @@
+start cmd /k "C:\Users\shawn\Documents\Code\HLJ\HLJ_backend\env\Scripts\activate.bat & cd C:\Users\shawn\Documents\Code\HLJ\HLJ_backend & env\Scripts\python.exe manage.py runserver"

@@ -1,0 +1,2 @@
+- POST REQUEST TO FAVOURITE FIGURES
+- ENABLE CSRF and ensure that we still can run post request
