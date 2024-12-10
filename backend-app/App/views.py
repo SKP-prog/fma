@@ -23,7 +23,7 @@ def figure(request):
     if page_num is None:
         page_num = 1
 
-    df, meta = con.get_figurine(jan_code=int(jan_code) if jan_code is not None else None, page_num=int(page_num))
+    df, meta = con.get_figurine(page_num=int(page_num))
     return JsonResponse({"results": df.to_dict("records"), "metadata": meta})
 
 
@@ -36,4 +36,6 @@ def favs(request):
         return HttpResponseBadRequest("Only POST Request Allowed.")
 
     jan_code = request.POST.get('jan', None)
-    return JsonResponse({"results": "HELLO!"})
+    con.set_table("Favourite")
+    con.add_row({"JAN_code": jan_code})
+    return JsonResponse({"results": f"Added {jan_code} to Favourites Table."})

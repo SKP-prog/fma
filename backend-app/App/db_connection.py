@@ -5,32 +5,38 @@ from math import ceil
 
 
 class DB:
-    def __init__(self, host=None, port=None, dbname=None):
+    def __init__(self, host=None, port=None, dbname=None, table_name=None):
         client = MongoClient(host, port)
         self.db = client[dbname]
-        self.table = self.db['Main']
+        self.table = self.db["Main" if table_name is None else table_name]
 
-    def add_row(self, table_name: str, row_entry: dict):
+    def set_table(self, table_name: str):
+        """
+        Just set the table name for other functions to access
+        """
+        self.table = self.db[table_name]
+
+    def add_row(self, row_entry: dict):
         """
         add row to collection (TABLE)
-        table_name: table name
         row_entry: dictionary for the table {column: value}
         """
-        self.db[table_name].insert_one(row_entry)
+        self.table.insert_one(row_entry)
 
-    def show_table(self, table_name: str, flt: dict = None):
+    def show_table(self, flt: dict = None):
         """
         table_name: Table Collection
         flt: dictionary filter
         """
         if flt is None:
             flt = {}
-        df = pd.DataFrame(list(self.db[table_name].find(flt)))
+        df = pd.DataFrame(list(self.table.find(flt)))
         if not df.empty:
             del df["_id"]
         return df
 
-    def get_figurine(self, jan_code: int = None, page_num=1, page_size=20):
+    def get_figurine(self, page_num=1, page_size=20):
+        # TODO: add method to filter for individual figurine
         # Create Filter Aggregate. Get unique JAN_code with all its required fields
         group = {
             "$group": {
