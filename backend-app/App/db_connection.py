@@ -84,7 +84,7 @@ class DB:
         meta_data = mongo_results['metadata'][0]
         meta_data["pageSize"] = page_size
         meta_data["totalPages"] = ceil(meta_data["totalRecords"] / page_size)
-
+        print(meta_data)
         df = pd.DataFrame(data)
         if df.empty:
             return pd.DataFrame(columns=["JAN_code", "img_url", "title", "page_url", "maker", "release_date"])

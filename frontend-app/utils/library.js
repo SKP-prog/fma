@@ -1,3 +1,4 @@
+// CREATE THUMBNAIL FOR HOMEPAGE
 export function make_thumbnail(body, data, src){
   const div = document.createElement("div");
   div.className = "thumbnail";
@@ -30,6 +31,7 @@ export function make_thumbnail(body, data, src){
   body.appendChild(div);
 }
 
+// SCRIPT TO SET CURRENT ACTIVE PAGE IN NAV BAR
 export function set_active_nav(to_active){
   // Toggle Class for Navigation. Just change the UI of Navbar 
   const nav_bar = document.getElementById("nav_wrapper").children;

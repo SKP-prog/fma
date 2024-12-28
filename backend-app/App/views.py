@@ -23,6 +23,7 @@ def figure(request):
     if page_num is None:
         page_num = 1
 
+    con.set_table("Main")
     df, meta = con.get_figurine(page_num=int(page_num))
     return JsonResponse({"results": df.to_dict("records"), "metadata": meta})
 
