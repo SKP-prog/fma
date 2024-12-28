@@ -23,6 +23,13 @@ class DB:
         """
         self.table.insert_one(row_entry)
 
+    def del_row(self, row_entry: dict):
+        """
+        remove row from collection (Table)
+        row_entry: dictionary to filter a single entry to delete {column: value}
+        """
+        self.table.delete_one(row_entry)
+
     def show_table(self, flt: dict = None):
         """
         table_name: Table Collection
@@ -36,6 +43,7 @@ class DB:
         return df
 
     def get_figurine(self, page_num=1, page_size=20):
+        self.table = self.db["Main"]
         # TODO: add method to filter for individual figurine
         # Create Filter Aggregate. Get unique JAN_code with all its required fields
         group = {
@@ -84,9 +92,15 @@ class DB:
         meta_data = mongo_results['metadata'][0]
         meta_data["pageSize"] = page_size
         meta_data["totalPages"] = ceil(meta_data["totalRecords"] / page_size)
-        print(meta_data)
+
         df = pd.DataFrame(data)
         if df.empty:
             return pd.DataFrame(columns=["JAN_code", "img_url", "title", "page_url", "maker", "release_date"])
 
-        return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date"]], meta_data
+        # Check if figure is in Favourite List
+        self.table = self.db["Favourite"]
+        fav_list = pd.DataFrame(list(self.table.find({})))
+        # Check dataframe if has item in fav list
+        df['is_fav'] = df['JAN_code'].isin(fav_list['JAN_code']).astype(int)
+
+        return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date", "is_fav"]], meta_data

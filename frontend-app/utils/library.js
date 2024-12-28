@@ -6,7 +6,7 @@ export function make_thumbnail(body, data, src){
   image.src = src;
 
   let track_html = "";
-  if (data.isTracked) {
+  if (data.is_fav) {
     track_html = `<i id="${data.JAN_code}" class="fa fa-heart fa" aria-hidden="true"></i>`;
   } else {
     track_html = `<i id="${data.JAN_code}" class="fa fa-heart-o fa" aria-hidden="true"></i>`;
@@ -51,18 +51,41 @@ export async function read_file(file_path){
 
 export function reload_hIcon(code) {
   const heart_icon = document.getElementById(code);
+  const api_url = "http://localhost:8000/favs";
+  
+  var data = new FormData();
+  data.append("jan", code);
+
   // If heart_icon is hollow, need to update server that this item is going to be tracked.
   // else stop tracking
 
-  var data = new FormData();
-  data.append("jan", code);
-  fetch("http://localhost:8000/favs", {
-    method: "POST",
-    body: data
-  }).then((rsp) => rsp.json())
-  .then((data) => {
-    console.log(data);
-  });
+  if(heart_icon.classList.contains("fa-heart-o")){
+    // if is not favourited
+    fetch(api_url, {
+      method: "POST",
+      body: data
+    }).then((rsp) => rsp.json())
+    .then((data) => {
+      console.log(data);
+      heart_icon.classList.remove("fa-heart-o");
+      heart_icon.classList.add("fa-heart")
+    });
+
+  } else {
+    // if was favourited, remove favourite
+    data.append("is_delete", true);
+
+    fetch(api_url, {
+      method: "POST",
+      body: data
+    }).then((data) => {
+      console.log(data);
+      heart_icon.classList.remove("fa-heart");
+      heart_icon.classList.add("fa-heart-o")
+    });
+  }
+
+
 }
 
 export function set_pagination(page_data){
