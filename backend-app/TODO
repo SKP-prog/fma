@@ -1,2 +1,4 @@
 - POST REQUEST TO FAVOURITE FIGURES
 - ENABLE CSRF and ensure that we still can run post request
+- Create init batch script to install and setup env
+- corsheader needs to be installed seperately
