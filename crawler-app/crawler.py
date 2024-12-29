@@ -16,13 +16,20 @@ HEAD = {
 
 
 def main():
+    print("Checking for New Release Updates!")
+    get_updates(is_in_stock=False)
+    print("Checking for In Stock Updates!")
+    get_updates()
+
+
+def get_updates(is_in_stock=True):
     prev_df = pd.DataFrame(m.get_db())
     if not prev_df.empty:
         del prev_df['_id']
 
     # Go to HLJ website and crawl all latest in stock figures
     entries = []
-    for item in get_items(max_pages=3):
+    for item in get_items(max_pages=3, is_in_stock=is_in_stock):
         entries.append(item)
 
     df = pd.DataFrame(entries)
@@ -45,10 +52,10 @@ def main():
         print("Nothing to Update.")
 
 
-def get_items(max_pages: int = 1) -> list:
+def get_items(max_pages: int = 1, is_in_stock: bool = False) -> list:
     for page in tqdm.tqdm(range(1, max_pages + 1), total=max_pages, desc="Crawling Data"):
         new_url = get_url(page=page, category="Figures",
-                          stock="In Stock", scale=[8, 7, 6, 5, 4],
+                          stock="In Stock" if is_in_stock else "All Future Release", scale=[8, 7, 6, 5, 4],
                           sort="releaseDate desc")
         rsp = request("GET", new_url, headers=HEAD)
 
