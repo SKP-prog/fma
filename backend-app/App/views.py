@@ -43,6 +43,9 @@ def favs(request):
         else:
             con.del_row({"JAN_code": int(jan_code)})
             return JsonResponse({"results": f"Removed {jan_code} from Favourites Table."})
+    elif request.method == "GET":
+        df, meta_data = con.get_favs()
+        return JsonResponse({"results": df.to_dict("records"), "metadata": meta_data})
 
     else:
         return HttpResponseBadRequest("Only POST Request Allowed.")

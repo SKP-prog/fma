@@ -1,4 +1,5 @@
 - POST REQUEST TO FAVOURITE FIGURES - DONE
+- Need to extract entry details for Favs. Cannot just return the JAN Code.
 - ENABLE CSRF and ensure that we still can run post request
 - Create init batch script to install and setup env
 - corsheader needs to be installed seperately

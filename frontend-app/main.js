@@ -9,26 +9,7 @@ window.onload = (e) => {
     set_active_nav("nav_home");
   });
   displayRecent();
-  // fetch("http://localhost:8000/app/figure/price?" + new URLSearchParams({code: "FIGURE-175747"}), {
-  //     method: "GET"
-  // }).then(rsp => rsp.json())
-  // .then(data => console.log(data));
 };
-
-// submit_btn.addEventListener("click", () => {
-//     /* Only server side need to enable cors. Client side if use cors, it will use pre-flight request which will fuck up the request. */
-//     fetch("http://localhost:8000/tracker/get", {
-//         method: "GET",
-//         headers: {
-//             "Accept": "application/json",
-//             "Content-Type": "application/json"
-//         },
-//     }).then((rsp) => rsp.json())
-//     .then((data) => {console.log(data)})
-//     .catch(rsp => {
-//         console.log(rsp);
-//     })
-// })
 
 function displayRecent() {
   // Get page Number

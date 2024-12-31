@@ -100,7 +100,58 @@ class DB:
         # Check if figure is in Favourite List
         self.table = self.db["Favourite"]
         fav_list = pd.DataFrame(list(self.table.find({})))
-        # Check dataframe if has item in fav list
+        # Check dataframe if it has item in fav list
         df['is_fav'] = df['JAN_code'].isin(fav_list['JAN_code']).astype(int)
+
+        return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date", "is_fav"]], meta_data
+
+    def get_favs(self, page_num=1, page_size=20):
+        lookup = {
+            "$lookup": {
+                "from": "Main",
+                "localField": "JAN_code",
+                "foreignField": "JAN_code",
+                "as": "all_details"
+            }
+        }
+        add_fields = {
+            "$addFields": {
+                "title": {"$first": "$all_details.title"},
+                "img_url": {"$first": "$all_details.img_url"},
+                "page_url": {"$first": "$all_details.page_url"},
+                "maker": {"$first": "$all_details.maker"},
+                "release_date": {"$first": "$all_details.release_date"},
+            }
+        }
+        pipeline = [
+            {
+                "$facet": {
+                    "data": [
+                        lookup,
+                        add_fields,
+                        {"$skip": (page_num - 1) * page_size},
+                        {"$limit": page_size}
+                    ],
+                    "metadata": [
+                        lookup,
+                        {"$count": "totalRecords"}
+                    ]
+                }
+            }
+        ]
+
+        # Extract Data From MongoDB
+        self.table = self.db["Favourite"]
+        mongo_results = list(self.table.aggregate(pipeline))[0]
+        data = mongo_results['data']
+
+        # Add Meta Data
+        meta_data = mongo_results['metadata'][0]
+        meta_data["pageSize"] = page_size
+        meta_data["totalPages"] = ceil(meta_data["totalRecords"] / page_size)
+
+        # Get All Results
+        df = pd.DataFrame(data)
+        df["is_fav"] = True
 
         return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date", "is_fav"]], meta_data
