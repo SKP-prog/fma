@@ -44,7 +44,8 @@ def favs(request):
             con.del_row({"JAN_code": int(jan_code)})
             return JsonResponse({"results": f"Removed {jan_code} from Favourites Table."})
     elif request.method == "GET":
-        df, meta_data = con.get_favs()
+        page_num = request.GET.get("page", None)
+        df, meta_data = con.get_favs(page_num=int(page_num))
         return JsonResponse({"results": df.to_dict("records"), "metadata": meta_data})
 
     else:

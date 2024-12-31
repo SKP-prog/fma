@@ -1,5 +1,5 @@
 import { 
-  make_thumbnail, read_file, set_active_nav, reload_hIcon, set_pagination
+  make_thumbnail, read_file, set_active_nav, reload_hIcon, set_pagination, get_figure_details
  } from "./utils/library.js";
 
 window.onload = (e) => {
@@ -20,7 +20,8 @@ function displayRecent() {
   }
   
   const content = document.getElementById("displayContent");
-  get_recent(pageNum).then((data) => {
+  get_figure_details(`http://localhost:8000/figures?page=${pageNum}`)
+  .then((data) => {
     data["results"].forEach((d) => {
       make_thumbnail(content, d, d.img_url);
       document.getElementById(`a_${d.JAN_code}`).onclick = () => reload_hIcon(d.JAN_code);
@@ -37,15 +38,4 @@ function displayRecent() {
     });
     set_pagination(data["metadata"]);
   });
-}
-
-async function get_recent(pageNum) {
-  const rsp = await fetch(`http://localhost:8000/figures?page=${pageNum}`, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-  });
-  return rsp.json();
 }

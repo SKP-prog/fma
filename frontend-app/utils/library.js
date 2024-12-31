@@ -130,3 +130,14 @@ export function set_pagination(page_data){
     }
   }
 }
+
+export async function get_figure_details(url) {
+  const rsp = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return rsp.json();
+}
