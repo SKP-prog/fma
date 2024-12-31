@@ -1,1 +1,1 @@
-start cmd /k "cd %~dp0 & npx live-server"
+start /min cmd /k "cd %~dp0 & npx live-server"

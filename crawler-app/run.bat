@@ -1,1 +1,1 @@
-start cmd /k "timeout /t 10 /nobreak & cd %~dp0 & env\Scripts\activate.bat & env\Scripts\python.exe crawler.py"
+start /min cmd /k "timeout /t 10 /nobreak & cd %~dp0 & env\Scripts\activate.bat & env\Scripts\python.exe crawler.py"
