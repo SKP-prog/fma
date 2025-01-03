@@ -42,10 +42,13 @@ class DB:
             del df["_id"]
         return df
 
-    def get_figurine(self, page_num=1, page_size=20):
+    def get_figurine(self, page_num=1, page_size=20, is_preorder=False):
         self.table = self.db["Main"]
         # TODO: add method to filter for individual figurine
         # Create Filter Aggregate. Get unique JAN_code with all its required fields
+        match = {
+            "$match": {"release"}
+        }
         group = {
             "$group": {
                 # Name each column to its new column name
@@ -60,8 +63,9 @@ class DB:
         }
         sort = {
             "$sort": {
-                "release_date": pymongo.DESCENDING,
-                "JAN_code": pymongo.DESCENDING
+                "date_extracted": pymongo.DESCENDING
+                # "release_date": pymongo.DESCENDING,
+                # "JAN_code": pymongo.DESCENDING
             }
         }
 

@@ -2,3 +2,15 @@
 - Add Search input for Home Screen
 - ENSURE THAT FAVOURITE BUTTON IN HOME IS WORKING AND SHOWS SOLID HEART IF FAVOURITED - DONE
 - Fix Pagination when numbers gets too large
+- see all the preorder period of all the figures i liked.
+- visualize the release date of figures i pre-ordered.
+- on figure thumbnail, tick to represent in stock and cross to represet pre-order
+- For Browse Page, seperate tabs between In-Stock and Pre-Order
+- redo database:
+    - Create new tables, keep old one as reference.
+    - release_date should be a datetime so we can check if this is preorder or is release_date
+    - the id should still be random generated. But we will be using JAN_Code as foreign keys.
+    - Split price and figure into different tables.
+        - price should store the name of the site it extracts from.
+        - price should store the JPY price only.
+        - figure table shoud store date added so we can sort by when the item was added into database.
