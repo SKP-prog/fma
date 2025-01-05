@@ -1,5 +1,5 @@
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, QueryDict
-from App.db_connection import DB
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from App.utils.db_connection import DB
 
 
 # Initialize Database Server Connection
