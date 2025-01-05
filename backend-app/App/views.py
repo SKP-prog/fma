@@ -1,5 +1,8 @@
+import pytz
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from App.utils.db_connection import DB
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 # Initialize Database Server Connection
@@ -20,10 +23,15 @@ def figure(request):
 
     jan_code = request.GET.get("jan", None)
     page_num = request.GET.get("page", None)
+    is_preorder = request.GET.get("is_preorder", 0)
     if page_num is None:
         page_num = 1
 
-    df, meta = con.get_figurine(page_num=int(page_num))
+    # Filter according to pre-order
+    now = datetime.now(tz=pytz.utc)
+    flt = {"release_date": {"$lte" if is_preorder == 0 else "$gt": now}}
+
+    df, meta = con.get_figurine(page_num=int(page_num), flt=flt)
     return JsonResponse({"results": df.to_dict("records"), "metadata": meta})
 
 

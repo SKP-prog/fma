@@ -14,23 +14,24 @@ class Command(BaseCommand):
         parser.add_argument('--dev', type=int, default=0)
 
     def handle(self, *args, **options):
-
         # Run Extraction Script
         if options["dev"] < 2:
             c = HLJCrawler(is_headless=options["dev"] == 0)
             fr_df = c.get_latest_release("All Future Release")
+            po_df = c.get_latest_release("In Stock")
+            df = pd.concat([fr_df, po_df])
 
             if options["dev"] == 1:
                 with open("data.pickle", "wb") as wf:
-                    pickle.dump(fr_df, wf)
+                    pickle.dump(df, wf)
         else:
             with open("data.pickle", "rb") as rf:
-                fr_df = pickle.load(rf)
+                df = pickle.load(rf)
 
         # Run Update Database Script
         fig_update, pri_update = 0, 0
         if options["dev"] == 0 or options["dev"] == 2:
-            fig_update, pri_update = self._update_db(fr_df)
+            fig_update, pri_update = self._update_db(df)
 
         self.stdout.write(self.style.SUCCESS(f'Ran Process in Mode: DEV={options["dev"]}. '
                                              f'Number of Figures Added: {fig_update}, '

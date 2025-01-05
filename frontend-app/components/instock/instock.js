@@ -6,7 +6,7 @@ window.onload = (e) => {
   read_file("/components/nav.html")
   .then(html_data => {
     document.getElementById("navigation").innerHTML = html_data;
-    set_active_nav("nav_browse");
+    set_active_nav("nav_instock");
   });
   displayRecent();
 };
@@ -23,6 +23,7 @@ function displayRecent() {
   get_figure_details(`http://localhost:8000/figures?page=${pageNum}`)
   .then((data) => {
     data["results"].forEach((d) => {
+      console.log(d.is_preorder)
       make_thumbnail(content, d);
       document.getElementById(`a_${d.jan_code}`).onclick = () => reload_hIcon(d.jan_code);
       // Add event listener on hover

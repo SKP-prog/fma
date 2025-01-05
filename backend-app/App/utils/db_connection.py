@@ -2,6 +2,7 @@ import pymongo
 from pymongo import MongoClient
 import pandas as pd
 from math import ceil
+from datetime import datetime
 
 
 class DB:
@@ -30,35 +31,25 @@ class DB:
             flt = {}
 
         match = {
-            "$match": {"release"}
-        }
-        group = {
-            "$group": {
-                "_id": {"jan_code": "$jan_code"},
-                "jan_code": {"$first": "$jan_code"},
-                "image_url": {"$first": "$image_url"},
-                "title": {"$first": "$title"},
-                "product_url": {"$first": "$product_url"},
-                "brand": {"$first": "$brand"},
-                "release_date": {"$first": "$release_date"}
-            }
+            "$match": flt
         }
         sort = {
             "$sort": {
-                "date_added": pymongo.DESCENDING,
+                "release_date": pymongo.DESCENDING,
+                "title": pymongo.DESCENDING,
             }
         }
         pipeline = [
             {
                 "$facet": {
                     "data": [
-                        group,
+                        match,
                         sort,
                         {"$skip": (page_num - 1) * page_size},
                         {"$limit": page_size}
                     ],
                     "metadata": [
-                        group,
+                        match,
                         {"$count": "totalRecords"}
                     ]
                 }
@@ -66,18 +57,30 @@ class DB:
         ]
 
         # Get Mongo Results
+        # mongo_results = list(self.db["figurine"].aggregate(pipeline))[0]
         mongo_results = list(self.db["figurine"].aggregate(pipeline))[0]
         data = mongo_results['data']
 
+        cols = ["jan_code", "image_url", "title", "product_url", "brand", "release_date", "is_preorder"]
+
         # Add Meta Data
-        meta_data = mongo_results['metadata'][0]
-        meta_data["pageSize"] = page_size
-        meta_data['totalPages'] = ceil(meta_data["totalRecords"] / page_size)
+        if len(mongo_results['metadata']) > 0:
+            meta_data = mongo_results['metadata'][0]
+            meta_data["pageSize"] = page_size
+            meta_data['totalPages'] = ceil(meta_data["totalRecords"] / page_size)
+        else:
+            meta_data = {
+                "pageSize": 0,
+                "totalPages": 0
+            }
 
         df = pd.DataFrame(data)
-        cols = ["jan_code", "image_url", "title", "product_url", "brand", "release_date"]
+
         if df.empty:
             return pd.DataFrame(columns=cols), meta_data
+        else:
+            # Check if preorder
+            df["is_preorder"] = df["release_date"] > datetime.now()
 
         return df[cols], meta_data
 
@@ -122,73 +125,6 @@ class DB:
         if not df.empty:
             del df["_id"]
         return df
-
-    # def get_figurine(self, page_num=1, page_size=20, is_preorder=False):
-    #     self.table = self.db["Main"]
-    #     # TODO: add method to filter for individual figurine
-    #     # Create Filter Aggregate. Get unique JAN_code with all its required fields
-    #     match = {
-    #         "$match": {"release"}
-    #     }
-    #     group = {
-    #         "$group": {
-    #             # Name each column to its new column name
-    #             "_id": {"JAN_code": "$JAN_code"},
-    #             "JAN_code": {"$first": "$JAN_code"},
-    #             "img_url": {"$first": "$img_url"},
-    #             "title": {"$first": "$title"},
-    #             "page_url": {"$first": "$page_url"},
-    #             "maker": {"$first": "$maker"},
-    #             "release_date": {"$first": "$release_date"},
-    #         }
-    #     }
-    #     sort = {
-    #         "$sort": {
-    #             "date_extracted": pymongo.DESCENDING
-    #             # "release_date": pymongo.DESCENDING,
-    #             # "JAN_code": pymongo.DESCENDING
-    #         }
-    #     }
-    #
-    #     pipeline = [
-    #         {
-    #             "$facet": {
-    #                 "data": [
-    #                     group,
-    #                     sort,
-    #                     {"$skip": (page_num - 1) * page_size},
-    #                     {"$limit": page_size}
-    #                 ],
-    #                 "metadata": [
-    #                     group,
-    #                     {"$count": "totalRecords"}
-    #                 ],
-    #             }
-    #         }
-    #     ]
-    #     # if jan_code is not None:
-    #     #     pipeline = [{"$match": {"JAN_code": jan_code}}] + pipeline
-    #
-    #     # Get Mongo Results
-    #     mongo_results = list(self.table.aggregate(pipeline))[0]
-    #     data = mongo_results['data']
-    #
-    #     # Add Meta Data
-    #     meta_data = mongo_results['metadata'][0]
-    #     meta_data["pageSize"] = page_size
-    #     meta_data["totalPages"] = ceil(meta_data["totalRecords"] / page_size)
-    #
-    #     df = pd.DataFrame(data)
-    #     if df.empty:
-    #         return pd.DataFrame(columns=["JAN_code", "img_url", "title", "page_url", "maker", "release_date"])
-    #
-    #     # Check if figure is in Favourite List
-    #     self.table = self.db["Favourite"]
-    #     fav_list = pd.DataFrame(list(self.table.find({})))
-    #     # Check dataframe if it has item in fav list
-    #     df['is_fav'] = df['JAN_code'].isin(fav_list['JAN_code']).astype(int)
-    #
-    #     return df[["JAN_code", "img_url", "title", "page_url", "maker", "release_date", "is_fav"]], meta_data
 
     def get_favs(self, page_num=1, page_size=20):
         lookup = {
