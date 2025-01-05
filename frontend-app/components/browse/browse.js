@@ -23,10 +23,10 @@ function displayRecent() {
   get_figure_details(`http://localhost:8000/figures?page=${pageNum}`)
   .then((data) => {
     data["results"].forEach((d) => {
-      make_thumbnail(content, d, d.img_url);
-      document.getElementById(`a_${d.JAN_code}`).onclick = () => reload_hIcon(d.JAN_code);
+      make_thumbnail(content, d);
+      document.getElementById(`a_${d.jan_code}`).onclick = () => reload_hIcon(d.jan_code);
       // Add event listener on hover
-      const detail = document.getElementById(`detail_${d.JAN_code}`);
+      const detail = document.getElementById(`detail_${d.jan_code}`);
       detail.addEventListener('mouseenter', (e) => { 
         e.target.classList.add("details-expand"); 
         e.target.classList.remove("details-collapse");

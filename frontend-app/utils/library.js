@@ -1,27 +1,27 @@
 // CREATE THUMBNAIL FOR HOMEPAGE
-export function make_thumbnail(body, data, src){
+export function make_thumbnail(body, data){
   const div = document.createElement("div");
   div.className = "thumbnail";
   const image = new Image();
-  image.src = src;
+  image.src = data.image_url;
 
   let track_html = "";
   if (data.is_fav) {
-    track_html = `<i id="${data.JAN_code}" class="fa fa-heart fa" aria-hidden="true"></i>`;
+    track_html = `<i id="${data.jan_code}" class="fa fa-heart fa" aria-hidden="true"></i>`;
   } else {
-    track_html = `<i id="${data.JAN_code}" class="fa fa-heart-o fa" aria-hidden="true"></i>`;
+    track_html = `<i id="${data.jan_code}" class="fa fa-heart-o fa" aria-hidden="true"></i>`;
   }
 
   div.innerHTML = `
-    <div id='detail_${data.JAN_code}' class='details details-collapse'>${data.title}</div>
+    <div id='detail_${data.jan_code}' class='details details-collapse'>${data.title}</div>
     <!--  Heart Icon -->
-    <a href="javascript:void(0);" id="a_${data.JAN_code}">
+    <a href="javascript:void(0);" id="a_${data.jan_code}">
     <div class="iconwrapper left">
       ${track_html}  
     </div>
     </a>
     <!-- HLJ Link -->
-    <a href="${data.page_url}" target="_blank">
+    <a href="${data.product_url}" target="_blank">
       <div class="iconwrapper right" style="background-color: white;"> 
         <img src="/assets/hlj.ico">
       </div>

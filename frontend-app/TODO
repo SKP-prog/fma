@@ -9,7 +9,7 @@
 - redo database:
     - Create new tables, keep old one as reference.
     - release_date should be a datetime so we can check if this is preorder or is release_date
-    - the id should still be random generated. But we will be using JAN_Code as foreign keys.
+    - the id should still be random generated. But we will be using jan_code as foreign keys.
     - Split price and figure into different tables.
         - price should store the name of the site it extracts from.
         - price should store the JPY price only.
