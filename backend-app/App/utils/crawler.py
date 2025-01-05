@@ -49,7 +49,6 @@ class HLJCrawler:
             all_data.append(data)
 
         df = pd.DataFrame(all_data)
-        df['date_added'] = datetime.now()
 
         return df
 
@@ -131,7 +130,11 @@ class HLJCrawler:
             for e in sp.find("div", attrs={"class": "product-details"}).find_all("li")
             if e.text.strip().split(":")[0] == "Release Date"
         ][0]
-        details["release_date"] = release_date
+        details["release_date"] = datetime.strptime(release_date, "%Y/%m/%d")
+
+        # Process Fields into appropriate data type
+        details["price"] = int(details['price'])
+        details['jan_code'] = int(details['jan_code'])
 
         return details
 

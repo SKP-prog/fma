@@ -6,6 +6,13 @@ from math import ceil
 
 class DB:
     def __init__(self, host=None, port=None, dbname=None, table_name=None):
+        """
+        Connection to Mongo DB
+        :param str host: url to local/remote mongo db
+        :param int port: Port number that the mongo db is using
+        :param str dbname: Name of database you want to connect to
+        :param str table_name: Initial Collection you want to connect to. This can be changed later.
+        """
         client = MongoClient(host, port)
         self.db = client[dbname]
         self.table = self.db["Main" if table_name is None else table_name]
@@ -22,6 +29,16 @@ class DB:
         row_entry: dictionary for the table {column: value}
         """
         self.table.insert_one(row_entry)
+
+    def add_rows(self, entries: list, table_name: str):
+        """
+        Add Multiple Rows to database
+
+        :param list entries: A list of dictionary to insert to database
+        :param str table_name: table name to update
+        """
+        assert hasattr(self.db, table_name), f"Unable to identify collection with name: {table_name}"
+        self.db[table_name].insert_many(entries)
 
     def del_row(self, row_entry: dict):
         """
