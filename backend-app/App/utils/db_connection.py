@@ -35,7 +35,7 @@ class DB:
         }
         sort = {
             "$sort": {
-                "release_date": pymongo.DESCENDING,
+                "date_added": pymongo.DESCENDING,
                 "title": pymongo.DESCENDING,
             }
         }
